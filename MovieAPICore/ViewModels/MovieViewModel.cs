@@ -8,7 +8,7 @@ namespace MovieAPICore.ViewModels
     public class MovieViewModel
     {
         public string title { get; set; }
-        public string Genre { get; set; }
+        public List<string> Genre { get; set; }
         public string ReleaseDate { get; set; }
     }
 }

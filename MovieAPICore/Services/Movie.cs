@@ -34,35 +34,37 @@ namespace MovieAPICore.Services
 
 
             var contents = await response.Content.ReadAsStringAsync();
-            var results = JsonConvert.DeserializeObject<Models.Response>(contents);
+            var responseMovie = JsonConvert.DeserializeObject<Models.ResponseMovie>(contents);
+            var responseGenre = await GetGenres();
 
             var data = new ViewModels.DataViewModel
             {
-                Page = results.Page,
-                TotalPages = results.Total_pages,
-                TotalResults = results.Total_results,
-                Movies = results.Results.Select(x => new ViewModels.MovieViewModel
+                Page = responseMovie.Page,
+                TotalPages = responseMovie.Total_pages,
+                TotalResults = responseMovie.Total_results,
+                Movies = responseMovie.Results.Select(x => new ViewModels.MovieViewModel
                 {
                     title = x.Title,
-                    ReleaseDate = x.Release_date
+                    ReleaseDate = x.Release_date,
+                    Genre = responseGenre.genres.Where(g => x.Genre_ids.Contains(g.Id)).Select(gn => gn.Name).ToList()
                 }).ToList()
             };
 
             return data;
         }
 
-        public async Task<List<Models.Genre>> GetGenres()
+        public async Task<Models.ResponseGenre> GetGenres()
         {
-            string action = $"/genre/movie/list?api_key={_key}&language={_language}";
+            string action = $"genre/movie/list?api_key={_key}&language={_language}";
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, _baseUrl + action);
 
             HttpResponseMessage response = await HttpInstance.GetHttpClientInstance().SendAsync(request);
 
-            var generes = new List<Models.Genre>();
+            var generes = new Models.ResponseGenre();
 
             var contents = await response.Content.ReadAsStringAsync();
-            generes = JsonConvert.DeserializeObject<List<Models.Genre>>(contents);
+            generes = JsonConvert.DeserializeObject<Models.ResponseGenre>(contents);
 
             return generes;
         }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace MovieAPICore.Models
 {
-    public class Response
+    public class ResponseMovie
     {
         public List<Movie> Results { get; set; }
         public int Page { get; set; }
