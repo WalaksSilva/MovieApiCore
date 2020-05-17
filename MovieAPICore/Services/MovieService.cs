@@ -34,32 +34,40 @@ namespace MovieAPICore.Services
 
             HttpResponseMessage response = await HttpInstance.GetHttpClientInstance().SendAsync(request);
 
-
-            var contents = await response.Content.ReadAsStringAsync();
-            var responseMovie = JsonConvert.DeserializeObject<Models.ResponseMovie>(contents);
-
-            var responseGenre = await GetGenres();
-
-            var data = new ViewModels.DataViewModel
+            if (response.IsSuccessStatusCode)
             {
-                Page = responseMovie.Page,
-                TotalPages = responseMovie.TotalPages,
-                TotalResults = responseMovie.TotalResults,
-                Total = responseMovie.Movies.Count,
-                Movies = responseMovie.Movies.Select(x => new ViewModels.MovieViewModel
-                {
-                    Title = x.Title,
-                    ReleaseDate = x.ReleaseDate,
-                    Genre = responseGenre.Genres.Where(g => x.GenreIds.Contains(g.Id)).Select(gn => gn.Name).ToList()
-                }).OrderByDescending(x => x.ReleaseDate).ToList()
-            };
+                var contents = await response.Content.ReadAsStringAsync();
+                var responseMovie = JsonConvert.DeserializeObject<Models.ResponseMovie>(contents);
 
-            return data;
+                var responseGenre = await GetGenres();
+
+                var data = new ViewModels.DataViewModel
+                {
+                    Page = responseMovie.Page,
+                    TotalPages = responseMovie.TotalPages,
+                    TotalResults = responseMovie.TotalResults,
+                    Total = responseMovie.Movies.Count,
+                    Movies = responseMovie.Movies.Select(x => new ViewModels.MovieViewModel
+                    {
+                        Title = x.Title,
+                        ReleaseDate = x.ReleaseDate,
+                        Genre = responseGenre.Genres.Where(g => x.GenreIds.Contains(g.Id)).Select(gn => gn.Name).ToList()
+                    }).OrderByDescending(x => x.ReleaseDate).ToList()
+                };
+
+                return data;
+            }
+            else
+            {
+                throw new Exception(string.Concat("Falha no carregamento dos filmes."));
+            }
+
+
         }
 
-        public async Task<Models.ResponseGenre> GetGenres()
+        private async Task<Models.ResponseGenre> GetGenres()
         {
-            
+
             var genres = new Models.ResponseGenre();
 
             //Verifica se já existe a lista de gêneros em memória, caso  exista é retornado
@@ -72,14 +80,22 @@ namespace MovieAPICore.Services
 
                 HttpResponseMessage response = await HttpInstance.GetHttpClientInstance().SendAsync(request);
 
-                var contents = await response.Content.ReadAsStringAsync();
-                genres = JsonConvert.DeserializeObject<Models.ResponseGenre>(contents);
-
-                //Inserido a lista de gêneros na memória por 1hr
-                _cache.Set("_Generes", genres, new MemoryCacheEntryOptions()
+                if (response.IsSuccessStatusCode)
                 {
-                    AbsoluteExpiration = DateTime.Now.AddHours(1)
-                });
+
+                    var contents = await response.Content.ReadAsStringAsync();
+                    genres = JsonConvert.DeserializeObject<Models.ResponseGenre>(contents);
+
+                    //Inserido a lista de gêneros na memória por 1hr
+                    _cache.Set("_Generes", genres, new MemoryCacheEntryOptions()
+                    {
+                        AbsoluteExpiration = DateTime.Now.AddHours(1)
+                    });
+                }
+                else
+                {
+                    throw new Exception(string.Concat("Falha no carregamento dos gêneros."));
+                }
             }
 
             return genres;
