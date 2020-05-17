@@ -5,7 +5,7 @@ API desenvolvida em ASP.NET Core 3.0 para obter os próximos filmes a serem lan�
 
 #  Exemplo de requisição
 
-Opcionalmente você pode especificar uma pagina usando o parâmetro **page**, como é exibido no exemplo a baixo. Caso não seja feito o uso do parâmetro **page**, API retornara apenas 20 filmes.
+Opcionalmente você pode especificar uma pagina usando o parâmetro **page**, como é exibido no exemplo abaixo. Caso não seja feito o uso do parâmetro **page**, API retornará apenas 20 filmes.
   - Com **page**
 >https://localhost:44309/api/movie/upcoming?page=1
 
@@ -30,7 +30,7 @@ Foi utilizada a estrutura  padrão do ASP.NET Core Web Application e criadas as 
 ## Bibliotecas utilizadas
 
 > HttpClient
- - Para o HttpClient foi utilizada o padrão singleton, onde foi criada uma instancia do HttpClient para que fosse possível a utilização em diversos lugares.
+ - Para o HttpClient foi utilizada o padrão singleton, onde foi criada uma instância do HttpClient para que fosse possível a utilização em diversos lugares.
 > MemoryCache
  - O MemoryCache foi utilizado para realizar o cacheamento dos dados de gêneros por 1 hora, assim evitando requisições excessivas a API themoviedb. 
 
