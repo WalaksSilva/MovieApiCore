@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
+using MovieAPICore.Services;
 using System;
 using System.Threading.Tasks;
 
@@ -10,15 +11,11 @@ namespace MovieAPICore.Controllers
     [Route("api/movie")]
     public class MovieController : ControllerBase
     {
-        private readonly Services.MovieService _srvMovie;
-        private readonly IConfiguration _configuration;
-        private IMemoryCache _cache;
+        private readonly IMovieService _movieService;
 
-        public MovieController(IConfiguration configuration, IMemoryCache memoryCache)
+        public MovieController(IMovieService movieService)
         {
-            _configuration = configuration;
-            _cache = memoryCache;
-            _srvMovie = new Services.MovieService(_configuration, _cache);
+            _movieService = movieService;
         }
 
         [HttpGet("upcoming")]
@@ -26,7 +23,7 @@ namespace MovieAPICore.Controllers
         {
             try
             {
-                var data = await _srvMovie.GetMovieUpcoming(page);
+                var data = await _movieService.GetMovieUpcoming(page);
 
                 return Ok(data);
             }

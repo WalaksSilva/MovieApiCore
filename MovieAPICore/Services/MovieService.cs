@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MovieAPICore.Services
 {
-    public class MovieService
+    public class MovieService : IMovieService
     {
         private readonly IConfiguration _configuration;
         private IMemoryCache _cache;
