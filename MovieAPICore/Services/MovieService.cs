@@ -2,15 +2,13 @@
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace MovieAPICore.Services
 {
-    public class Movie
+    public class MovieService
     {
         private readonly IConfiguration _configuration;
         private IMemoryCache _cache;
@@ -18,7 +16,7 @@ namespace MovieAPICore.Services
         private static string _key;
         private static string _language;
 
-        public Movie(IConfiguration configuration, IMemoryCache memoryCache)
+        public MovieService(IConfiguration configuration, IMemoryCache memoryCache)
         {
             _configuration = configuration;
             _cache = memoryCache;
@@ -43,15 +41,15 @@ namespace MovieAPICore.Services
             var data = new ViewModels.DataViewModel
             {
                 Page = responseMovie.Page,
-                TotalPages = responseMovie.Total_pages,
-                TotalResults = responseMovie.Total_results,
-                Total = responseMovie.Results.Count,
-                Movies = responseMovie.Results.Select(x => new ViewModels.MovieViewModel
+                TotalPages = responseMovie.TotalPages,
+                TotalResults = responseMovie.TotalResults,
+                Total = responseMovie.Movies.Count,
+                Movies = responseMovie.Movies.Select(x => new ViewModels.MovieViewModel
                 {
-                    title = x.Title,
-                    ReleaseDate = x.Release_date,
-                    Genre = responseGenre.genres.Where(g => x.Genre_ids.Contains(g.Id)).Select(gn => gn.Name).ToList()
-                }).ToList()
+                    Title = x.Title,
+                    ReleaseDate = x.ReleaseDate,
+                    Genre = responseGenre.Genres.Where(g => x.GenreIds.Contains(g.Id)).Select(gn => gn.Name).ToList()
+                }).OrderByDescending(x => x.ReleaseDate).ToList()
             };
 
             return data;
@@ -60,10 +58,10 @@ namespace MovieAPICore.Services
         public async Task<Models.ResponseGenre> GetGenres()
         {
             
-            var generes = new Models.ResponseGenre();
+            var genres = new Models.ResponseGenre();
 
 
-            if (!_cache.TryGetValue("_Generes", out generes))
+            if (!_cache.TryGetValue("_Generes", out genres))
             {
 
                 string action = $"genre/movie/list?api_key={_key}&language={_language}";
@@ -73,15 +71,15 @@ namespace MovieAPICore.Services
                 HttpResponseMessage response = await HttpInstance.GetHttpClientInstance().SendAsync(request);
 
                 var contents = await response.Content.ReadAsStringAsync();
-                generes = JsonConvert.DeserializeObject<Models.ResponseGenre>(contents);
+                genres = JsonConvert.DeserializeObject<Models.ResponseGenre>(contents);
 
-                _cache.Set("_Generes", generes, new MemoryCacheEntryOptions()
+                _cache.Set("_Generes", genres, new MemoryCacheEntryOptions()
                 {
-                    AbsoluteExpiration = DateTime.Now.AddMinutes(2)
+                    AbsoluteExpiration = DateTime.Now.AddHours(1)
                 });
             }
 
-            return generes;
+            return genres;
         }
     }
 }

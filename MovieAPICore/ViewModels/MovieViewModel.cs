@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace MovieAPICore.ViewModels
 {
     public class MovieViewModel
     {
-        public string title { get; set; }
+        public string Title { get; set; }
         public List<string> Genre { get; set; }
         public string ReleaseDate { get; set; }
     }

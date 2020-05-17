@@ -1,16 +1,17 @@
-﻿using System;
+﻿using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MovieAPICore.Models
 {
     public class ResponseMovie
     {
-        public List<Movie> Results { get; set; }
+        [JsonProperty("Results")]
+        public List<Movie> Movies { get; set; }
         public int Page { get; set; }
-        public int Total_results { get; set; }
-        public int Total_pages { get; set; }
+        [JsonProperty("Total_results")]
+        public int TotalResults { get; set; }
+        [JsonProperty("Total_pages")]
+        public int TotalPages { get; set; }
     }
 
 
