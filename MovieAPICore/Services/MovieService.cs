@@ -36,6 +36,7 @@ namespace MovieAPICore.Services
 
             var contents = await response.Content.ReadAsStringAsync();
             var responseMovie = JsonConvert.DeserializeObject<Models.ResponseMovie>(contents);
+
             var responseGenre = await GetGenres();
 
             var data = new ViewModels.DataViewModel
@@ -60,7 +61,7 @@ namespace MovieAPICore.Services
             
             var genres = new Models.ResponseGenre();
 
-
+            //Verifica se já existe a lista de gêneros em memória, caso  exista é retornado
             if (!_cache.TryGetValue("_Generes", out genres))
             {
 
@@ -73,6 +74,7 @@ namespace MovieAPICore.Services
                 var contents = await response.Content.ReadAsStringAsync();
                 genres = JsonConvert.DeserializeObject<Models.ResponseGenre>(contents);
 
+                //Inserido a lista de gêneros na memória por 1hr
                 _cache.Set("_Generes", genres, new MemoryCacheEntryOptions()
                 {
                     AbsoluteExpiration = DateTime.Now.AddHours(1)
